@@ -2,9 +2,9 @@ import flash
 import argparse
 
 parser = argparse.ArgumentParser(
-    description = "A not so fast simple interpreter."
+    description = "Not so fast simple interpreter."
 )
-parser.add_arguments(
+parser.add_argument(
     "file",
     nargs = "?",
     help = "Input file."
