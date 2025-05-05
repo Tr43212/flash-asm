@@ -1,3 +1,22 @@
+"""
+flash: Not so fast simple interpreter.
+
+Keywords:
+- add, sub, mul, div, mod, pow, sqrt, cbrt, abs
+- print, blank, load, copy, swap
+- ieq, ine, igt, ilt, ige, ile
+- return, halt
+- sleep
+- round, floor, ceil
+- and, or, xor, not
+- nop
+
+Functions:
+- init
+- tokenize
+- execute
+"""
+
 import csv
 import io
 
@@ -76,3 +95,25 @@ def execute(token):
             print(regs[reg])
         elif kword == "blank":
             regs[reg] = None
+    elif kword in ["ieq", "ine", "igt", "ilt", "ige", "ile"]:
+        if len(args) != 3:
+            raise e.ArgumentError(f"Expected 3 arguments ({len(args)} given).")
+        reg1 = args[0]
+        reg2 = args[1]
+        reg3 = args[2]
+        if reg1[-1] != reg2[-1]:
+            raise e.RegisterError
+        if reg3[-1] != "b":
+            raise e.RegisterError
+        if kword == "ieq":
+            regs[reg3] = regs[reg1] == regs[reg2]
+        elif kword == "ine":
+            regs[reg3] = regs[reg1] != regs[reg2]
+        elif kword == "igt":
+            regs[reg3] = regs[reg1] > regs[reg2]
+        elif kword == "ilt":
+            regs[reg3] = regs[reg1] < regs[reg2]
+        elif kword == "ige":
+            regs[reg3] = regs[reg1] >= regs[reg2]
+        elif kword == "ile":
+            regs[reg3] = regs[reg1] <= regs[reg2]
