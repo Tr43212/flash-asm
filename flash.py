@@ -34,16 +34,45 @@ def execute(token):
     if len(token) == 1:
         raise e.ArgumentError("No argument provided.")
     args = token[1:]
-    if kword in ["add", "sub", "mul", "div", "mod"]:
+    if kword in ["add", "sub", "mul", "div", "mod", "pow"]:
         if len(args) != 3:
-            raise e.ArgumentError(f"Excepted 3 arguments ({len(args)} given)")
+            raise e.ArgumentError(f"Excepted 3 arguments ({len(args)} given).")
         reg1 = args[0]
         reg2 = args[1]
         dest = args[2]
+        if reg1 not in regs:
+            raise e.RegisterError(f"Register '{reg1}' is not a valid register.")
+        if reg2 not in regs:
+            raise e.RegisterError(f"Register '{reg2}' is not a valid register.")
+        if reg1[-1] != "n":
+            raise e.RegisterError(f"Register '{reg1}' is not a number register.")
+        if reg2[-1] != "n":
+            raise e.RegisterError(f"Register '{reg2}' is not a number register.")
         if regs[reg1] == None:
             raise e.RegisterError(f"Register '{reg1}' is not assigned to any value.")
         if regs[reg2] == None:
             raise e.RegisterError(f"Register '{reg2}' is not assigned to any value.")
         if regs[dest] != None:
-            raise e.RegisterError(f"Register '{dest}' is stored value '{regs[dest]}'.")
-    # more soon im lazy
+            raise e.RegisterError(f"Register '{dest}' is assigned to value '{regs[dest]}'.")
+        if kword == "add":
+            regs[dest] = regs[reg1] + regs[reg2]
+        elif kword == "sub":
+            regs[dest] = regs[reg1] - regs[reg2]
+        elif kword == "mul":
+            regs[dest] = regs[reg1] * regs[reg2]
+        elif kword == "div":
+            regs[dest] = regs[reg1] / regs[reg2]
+        elif kword == "mod":
+            regs[dest] = regs[reg1] % regs[reg2]
+        elif kword == "pow":
+            regs[dest] = regs[reg1] ** regs[reg2]
+    elif kword in ["print", "blank"]:
+        if len(args) != 1:
+            raise e.ArgumentError(f"Expected 1 argument ({len(args)} given).")
+        reg = args[0]
+        if reg not in regs:
+            raise e.RegisterError(f"Register '{reg}' is not a valid register.")
+        if kword == "print":
+            print(regs[reg])
+        elif kword == "blank":
+            regs[reg] = None
