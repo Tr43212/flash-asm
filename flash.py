@@ -17,9 +17,6 @@ Functions:
 - execute
 """
 
-import csv
-import io
-
 class e:
     class KeywordError(Exception):
         def __init__(self, msg):
@@ -32,6 +29,10 @@ class e:
             super().__init__(msg)
 
 def init():
+    global csv
+    global io
+    csv = __import__("csv")
+    io = __import__("io")
     global regs
     regs = {}
     for i in range(1, 11):
@@ -50,6 +51,10 @@ def execute(token):
     if len(token) == 0:
         raise e.KeywordError("No keyword provided.")
     kword = token[0]
+    if kword == "nop":
+        return
+    elif kword == "halt":
+        exit(130)
     if len(token) == 1:
         raise e.ArgumentError("No argument provided.")
     args = token[1:]
@@ -102,9 +107,13 @@ def execute(token):
         reg2 = args[1]
         reg3 = args[2]
         if reg1[-1] != reg2[-1]:
-            raise e.RegisterError
+            raise e.RegisterError(f"Registers '{reg1}' and '{reg2}' are not the same type.")
         if reg3[-1] != "b":
-            raise e.RegisterError
+            raise e.RegisterError(f"Register '{reg3}' is not a bool register.")
+        if regs[reg1] == None:
+            raise e.RegisterError(f"Register '{reg1}' is not assigned to any value.")
+        if regs[reg2] == None:
+            raise e.RegisterError(f"Register '{reg2}' is not assigned to any value.")
         if kword == "ieq":
             regs[reg3] = regs[reg1] == regs[reg2]
         elif kword == "ine":
@@ -117,3 +126,22 @@ def execute(token):
             regs[reg3] = regs[reg1] >= regs[reg2]
         elif kword == "ile":
             regs[reg3] = regs[reg1] <= regs[reg2]
+    elif kword in ["copy", "swap"]:
+        if len(args) != 2:
+            raise e.ArgumentError(f"Expected 2 arguments ({len(args)} given).")
+        reg1 = args[0]
+        reg2 = args[1]
+        if reg1[-1] != reg2[-1]:
+            raise e.RegisterError(f"Registers '{reg1}' and '{reg2}' are not the same type.")
+        if regs[reg1] == None:
+            raise e.RegisterError(f"Register '{reg1}' is not assigned to any value.")
+        if kword == "copy":
+            if regs[reg2] != None:
+                raise e.RegisterError(f"Register '{reg2}' is assigned to value '{regs[reg2]}'.")
+            regs[reg2] = regs[reg1]
+        elif kword == "swap":
+            if regs[reg2] == None:
+                raise e.RegisterError(f"Register '{reg2}' is not assigned to any value.")
+            temp = regs[reg2]
+            regs[reg2] = regs[reg1]
+            regs[reg1] = temp
